@@ -1,0 +1,21 @@
+# Dependencies
+node_modules/
+
+# npm pack output
+*.tgz
+
+# Logs
+*.log
+npm-debug.log*
+
+# Environment / secrets
+.env
+.env.*
+.npmrc
+
+# Editor / IDE
+.idea/
+.vscode/
+
+# OS files
+.DS_Store

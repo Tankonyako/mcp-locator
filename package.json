@@ -1,0 +1,35 @@
+{
+  "name": "mcp-locator",
+  "version": "1.0.0",
+  "description": "MCP server for managing locale JSON translation files",
+  "type": "module",
+  "bin": {
+    "mcp-locator": "bin/mcp-locator.js"
+  },
+  "main": "bin/mcp-locator.js",
+  "files": [
+    "bin",
+    "src",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "node bin/mcp-locator.js",
+    "inspector": "npx @modelcontextprotocol/inspector node bin/mcp-locator.js"
+  },
+  "keywords": [
+    "mcp",
+    "i18n",
+    "localization",
+    "translation",
+    "model-context-protocol"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.17.5",
+    "zod": "^3.23.8"
+  }
+}
