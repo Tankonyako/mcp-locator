@@ -1,9 +1,10 @@
 import { z } from 'zod';
 import { McpError, ErrorCode } from '@modelcontextprotocol/sdk/types.js';
+import { buildTree, renderTree } from './modes.js';
 
 /**
- * Registers 5 tools per locale on the McpServer:
- *   set_<code>, get_<code>, has_<code>, list_<code>, search_<code>
+ * Registers 6 tools per locale on the McpServer:
+ *   set_<code>, get_<code>, has_<code>, list_<code>, tree_<code>, search_<code>
  *
  * @param {import('@modelcontextprotocol/sdk/server/mcp.js').McpServer} server
  * @param {import('./store.js').LocaleStore} store
@@ -77,6 +78,30 @@ export function registerLocaleTools(server, store) {
     async () => {
       const keys = store.list();
       return text({ locale: code, count: keys.length, keys });
+    }
+  );
+
+  server.registerTool(
+    `tree_${code}`,
+    {
+      title: `Tree of ${label} keys`,
+      description:
+        `Render the ${label} locale keys as an ASCII tree, reconstructed from the key paths. ` +
+        `When depth is true (default), every key is shown including the string-valued leaves. ` +
+        `When depth is false, only the namespace structure is shown — string-leaf keys are hidden, ` +
+        `giving a compact overview of how the catalog is organized.`,
+      inputSchema: {
+        depth: z
+          .boolean()
+          .optional()
+          .describe('true = full tree with all keys (default); false = namespace structure only, hiding string leaves'),
+      },
+    },
+    async ({ depth = true }) => {
+      const keys = store.list();
+      const rendered = renderTree(buildTree(keys, store.splitter), depth);
+      const header = `${label} locale — ${keys.length} key(s)${depth ? '' : ' (structure only)'}`;
+      return { content: [{ type: 'text', text: `${header}\n${rendered || '(empty)'}` }] };
     }
   );
 

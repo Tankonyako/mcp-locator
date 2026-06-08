@@ -60,3 +60,49 @@ export function unflattenInline(map) {
   }
   return obj;
 }
+
+/**
+ * Builds a nested tree from flat key paths.
+ * Each node is { children: {...}, leaf: boolean }. A node is a `leaf` when a
+ * key path terminates at it (it holds a string value); a node with a non-empty
+ * `children` map is a namespace.
+ * @param {string[]} keys
+ * @param {string} splitter
+ * @returns {Record<string, {children: object, leaf: boolean}>}
+ */
+export function buildTree(keys, splitter) {
+  const root = {};
+  for (const key of keys) {
+    const parts = key.split(splitter);
+    let node = root;
+    parts.forEach((part, i) => {
+      if (!node[part]) node[part] = { children: {}, leaf: false };
+      if (i === parts.length - 1) node[part].leaf = true;
+      node = node[part].children;
+    });
+  }
+  return root;
+}
+
+/**
+ * Renders a tree (from {@link buildTree}) into an ASCII tree string.
+ * When `full` is false, string-leaf keys are omitted and only namespace nodes
+ * (keys that contain nested children) are shown.
+ * @param {Record<string, {children: object, leaf: boolean}>} tree
+ * @param {boolean} full
+ * @returns {string}
+ */
+export function renderTree(tree, full) {
+  const lines = [];
+  const walk = (node, prefix) => {
+    let names = Object.keys(node).sort((a, b) => a.localeCompare(b));
+    if (!full) names = names.filter(n => Object.keys(node[n].children).length > 0);
+    names.forEach((name, idx) => {
+      const last = idx === names.length - 1;
+      lines.push(`${prefix}${last ? '└─ ' : '├─ '}${name}`);
+      walk(node[name].children, `${prefix}${last ? '   ' : '│  '}`);
+    });
+  };
+  walk(tree, '');
+  return lines.join('\n');
+}

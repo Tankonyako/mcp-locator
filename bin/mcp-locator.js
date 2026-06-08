@@ -16,7 +16,7 @@ for (const [code, filePath] of cfg.locales) {
 
 const server = new McpServer({
   name: 'mcp-locator',
-  version: '1.0.0',
+  version: '1.1.0',
 });
 
 for (const store of stores.values()) {
