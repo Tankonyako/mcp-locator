@@ -141,20 +141,21 @@ Add to `~/Library/Application Support/Claude/claude_desktop_config.json`:
 
 ## 🧭 Practical workflow: English as the source of truth
 
-A common setup is **"write everything in English first, then fan out to the other locales."** Drop an instruction block like this into your agent's `AGENTS.md` / `CLAUDE.md` / system prompt:
+A common setup is **"always write in English while you build, then translate the missing locales later in one pass."** Drop an instruction block like this into your agent's `AGENTS.md` / `CLAUDE.md` / system prompt:
 
 ```text
 You manage translations through the `locator` MCP server. Rules:
 
-1. English (`en`) is the single source of truth. Every new user-facing
-   string is written to `en` FIRST, via set_en / set_batch_en.
-2. Never hand-edit the locale JSON files. Always go through the tools.
-3. Keys are namespaced by domain: `OrderTopUp.minDepositTitle`, not full
+1. ALWAYS write user-facing strings in English (`en`) — and ONLY `en`.
+   English is the single source of truth. Use set_en / set_batch_en.
+2. Do NOT translate into other locales while building a feature. Leave the
+   other locales alone — they get filled in later, on demand (see below).
+3. Never hand-edit the locale JSON files. Always go through the tools.
+4. Keys are namespaced by domain: `OrderTopUp.minDepositTitle`, not full
    sentences. Search before inventing — reuse beats duplicate (search_en).
-4. After adding an `en` key, add the same key to every other locale.
 ```
 
-Then this one natural-language command keeps every locale in sync — **scan for missing translations and fill them all in**:
+**Then, once the English copy is finished**, you ask for translations as a separate step. A natural-language command like this scans for everything missing and fills it in across every locale and phrase:
 
 > **"Sync translations: run `diff` to find keys missing from each locale, read the English source for each with `get_en`, translate them, and write them back with `set_batch_<code>`."**
 
